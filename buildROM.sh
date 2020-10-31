@@ -85,11 +85,10 @@ START=$(date +%s)
 
 # Setup environment
 echo -e "${bldblu}Setting up build environment ${txtrst}"
-cd ~/validus/
+cd ~/mnt/disks/home/rom/gzosp
 . build/envsetup.sh
 # Setup ccache
 export USE_CCACHE=1
-export CCACHE_DIR="home/stoccomatis7/cchace/"
 /usr/bin/ccache -M 25G
 
 #Clean the out dir
@@ -97,7 +96,7 @@ export CCACHE_DIR="home/stoccomatis7/cchace/"
   make clean
 
 #Building time !
-lunch validus_whyred-userdebug && mka api-stubs-docs && mka hiddenapi-lists-docs && mka system-api-stubs-docs && mka test-api-stubs-docs && mka validus
+lunch gzosp_whyred-userdebug && make gzosp
 
 # back to root dir
 cd ~/
@@ -118,22 +117,24 @@ BUILDTIME="Build time: $(echo $((${END}-${START})) | awk '{print int($1/60)" min
 command
 Log_Close
 
-echo "FINDING ROM FILE"
+curl -s -X POST https://api.telegram.org/bot"insertyourbotid"/sendMessage -d chat_id="insertyourchatid" -d text="Build Stopped"
 
-if 
-    find ~/validus/out/target/product/whyred/ -name '*Validus-whyred-*'.zip
-then 
-rclone copy ~/validus/out/target/product/whyred/Validus-whyred-*.zip  gdrive:rom
-rclone copy ~/validus/out/target/product/whyred/Validus-whyred-*.md5sum  gdrive:rom
+# echo "FINDING ROM FILE"
 
-#Send message to Telegram group after build & upload complete
-curl -s -X POST https://api.telegram.org/bot"insertyourbotid"/sendMessage -d chat_id="insertyourchatid" -d text= "Build done !
-Get it here http://url.stoccomatis.com/rom"
+# if 
+#     find ~/validus/out/target/product/whyred/ -name '*Validus-whyred-*'.zip
+# then 
+# rclone copy ~/validus/out/target/product/whyred/Validus-whyred-*.zip  gdrive:rom
+# rclone copy ~/validus/out/target/product/whyred/Validus-whyred-*.md5sum  gdrive:rom
 
-#shut down the VM
-sudo poweroff
+# #Send message to Telegram group after build & upload complete
+# curl -s -X POST https://api.telegram.org/bot"insertyourbotid"/sendMessage -d chat_id="insertyourchatid" -d text= "Build done !
+# Get it here http://url.stoccomatis.com/rom"
 
-else
-    curl -s -X POST https://api.telegram.org/bot"insertyourbotid"/sendMessage -d chat_id="insertyourchatid" -d text="Build failed !"
-    sudo poweroff
-fi
+# #shut down the VM
+# sudo poweroff
+
+# else
+#     curl -s -X POST https://api.telegram.org/bot"insertyourbotid"/sendMessage -d chat_id="insertyourchatid" -d text="Build failed !"
+#     sudo poweroff
+# fi
